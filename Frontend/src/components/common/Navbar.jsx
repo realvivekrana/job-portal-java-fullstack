@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { ROLE_HOME } from '../../utils/constants'
@@ -12,6 +12,22 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const close = () => setOpen(false)
+
+  // Mobile menu: Esc closes it, page behind doesn't scroll, auto-closes when resized to desktop
+  useEffect(() => {
+    if (!open) return undefined
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    const onResize = () => window.innerWidth >= 1024 && setOpen(false)
+    document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', onResize)
+      document.body.style.overflow = prev
+    }
+  }, [open])
 
   const handleLogout = () => {
     close()

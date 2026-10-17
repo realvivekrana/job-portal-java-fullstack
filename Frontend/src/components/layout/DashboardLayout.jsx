@@ -17,11 +17,14 @@ export default function DashboardLayout() {
   useEffect(() => {
     if (!open) return undefined
     const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    const onResize = () => window.innerWidth >= 1024 && setOpen(false)
     document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', onResize)
       document.body.style.overflow = prev
     }
   }, [open])
