@@ -50,3 +50,24 @@ export const ROLE_HOME = {
 export const MAX_FILE_SIZE = 5 * 1024 * 1024
 export const RESUME_EXTENSIONS = ['pdf', 'doc', 'docx']
 export const LOGO_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp']
+
+// Fallback used until /api/public/site answers (or if the server is down). Admin can change all of these.
+export const DEFAULT_SITE = {
+  siteName: 'JobPortal',
+  siteTagline: 'Find jobs. Hire talent.',
+  heroTitle: 'Find work you want to wake up for.',
+  heroLead:
+    'Search openings from companies that are hiring now, apply in a couple of taps and follow every application in one place.',
+  candidatePoints:
+    'Filter by skill, location, job type and salary\nApply with a saved resume and a short cover letter\nTrack every application from applied to hired',
+  recruiterPoints:
+    'Create your company page and post jobs in minutes\nReview applicants and open resumes in one click\nShortlist, hire or reject with automatic email updates',
+  ctaTitle: 'Ready to get started?',
+  ctaText: 'Join as a candidate to apply, or as a recruiter to start hiring.',
+  authHeadline: 'Your next role, or your next hire, starts here.',
+  authPoints:
+    'Search openings and apply with one saved resume\nPost jobs and shortlist applicants in one place\nGet email updates when your application status changes',
+  footerAbout: 'A simple place for candidates to find the right job and for recruiters to hire the right people.',
+  footerNote: 'Made in India',
+  contactEmail: '',
+}

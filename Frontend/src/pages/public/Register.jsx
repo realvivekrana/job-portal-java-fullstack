@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../../components/common/Icon'
 import useAuth from '../../hooks/useAuth'
+import useSite from '../../hooks/useSite'
 import useToast from '../../hooks/useToast'
 import { ROLE_HOME, ROLES } from '../../utils/constants'
 import { getErrorMessage, getFieldErrors } from '../../utils/helpers'
 
 export default function Register() {
   const { register, isAuthenticated, user } = useAuth()
+  const { site } = useSite()
   const toast = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -53,7 +55,7 @@ export default function Register() {
         password: form.password,
         role: form.role,
       })
-      toast.success('Account created. Welcome to JobPortal!')
+      toast.success(`Account created. Welcome to ${site.siteName}!`)
       navigate(created.role === ROLES.RECRUITER ? '/recruiter/company' : ROLE_HOME[created.role], { replace: true })
     } catch (err) {
       setErrors(getFieldErrors(err))

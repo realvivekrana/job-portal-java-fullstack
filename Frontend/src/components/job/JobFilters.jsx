@@ -1,9 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from '../common/Icon'
+import useSite from '../../hooks/useSite'
 import { JOB_TYPES, SORT_OPTIONS } from '../../utils/constants'
 
 export default function JobFilters({ filters, onChange, onReset }) {
   const [open, setOpen] = useState(false)
+  const { overview, refreshOverview } = useSite()
+  useEffect(() => {
+    if (!overview) refreshOverview()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const activeCount = ['keyword', 'location', 'jobType', 'minSalary', 'maxExperience'].filter((k) => filters[k]).length
 
   return (
@@ -21,14 +27,20 @@ export default function JobFilters({ filters, onChange, onReset }) {
       <div className={`filters-body${open ? ' open' : ''}`}>
         <div className="field">
           <label htmlFor="f-keyword">Keyword</label>
-          <input id="f-keyword" className="input" placeholder="Title, skill or company"
+          <input id="f-keyword" className="input" list="f-keyword-list" placeholder="Title, skill or company"
             value={filters.keyword} onChange={(e) => onChange({ keyword: e.target.value })} />
         </div>
         <div className="field">
           <label htmlFor="f-location">Location</label>
-          <input id="f-location" className="input" placeholder="City or state"
+          <input id="f-location" className="input" list="f-location-list" placeholder="City or state"
             value={filters.location} onChange={(e) => onChange({ location: e.target.value })} />
         </div>
+        <datalist id="f-keyword-list">
+          {(overview?.popularSkills || []).map((k) => <option key={k} value={k} />)}
+        </datalist>
+        <datalist id="f-location-list">
+          {(overview?.popularLocations || []).map((l) => <option key={l} value={l} />)}
+        </datalist>
         <div className="field">
           <label htmlFor="f-type">Job type</label>
           <select id="f-type" className="input" value={filters.jobType}

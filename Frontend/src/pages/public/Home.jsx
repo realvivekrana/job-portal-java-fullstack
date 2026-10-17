@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import JobCard from '../../components/job/JobCard'
 import Icon from '../../components/common/Icon'
@@ -7,27 +7,17 @@ import ErrorState from '../../components/common/ErrorState'
 import EmptyState from '../../components/common/EmptyState'
 import useApi from '../../hooks/useApi'
 import useAuth from '../../hooks/useAuth'
+import useSite from '../../hooks/useSite'
 import { searchJobs } from '../../api/jobApi'
 import { JOB_TYPES, ROLE_HOME } from '../../utils/constants'
-import { formatSalary, initials } from '../../utils/helpers'
+import { fileUrl, formatSalary, initials, lines, plural } from '../../utils/helpers'
 
-const POPULAR = ['Java Developer', 'React', 'Fresher', 'Pune', 'Remote']
 const TYPE_ICONS = { FULL_TIME: 'briefcase', PART_TIME: 'clock', INTERNSHIP: 'cap', REMOTE: 'laptop', CONTRACT: 'file' }
-
-const CANDIDATE_POINTS = [
-  'Filter by skill, location, job type and salary',
-  'Apply with a saved resume and a short cover letter',
-  'Track every application from applied to hired',
-]
-const RECRUITER_POINTS = [
-  'Create your company page and post jobs in minutes',
-  'Review applicants and open resumes in one click',
-  'Shortlist, hire or reject with automatic email updates',
-]
 
 export default function Home() {
   const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
+  const { site, overview, refreshOverview } = useSite()
   const [keyword, setKeyword] = useState('')
   const [location, setLocation] = useState('')
   const { data, error, loading, reload } = useApi(() => searchJobs({ size: 6 }), [])
@@ -40,18 +30,25 @@ export default function Home() {
     navigate(`/jobs?${params.toString()}`)
   }
 
+  // always show fresh numbers when the home page opens
+  useEffect(() => {
+    refreshOverview()
+  }, [refreshOverview])
+
   const latest = data?.content?.slice(0, 3) || []
+  const typeCounts = Object.fromEntries((overview?.jobTypes || []).map((t) => [t.type, t.count]))
+  const stats = overview?.stats
+  const skills = overview?.popularSkills || []
+  const cities = overview?.popularLocations || []
+  const companies = overview?.topCompanies || []
 
   return (
     <>
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <h1>Find work you want to wake up for.</h1>
-            <p className="hero-lead">
-              Search openings from companies that are hiring now, apply in a couple of taps and follow every
-              application in one place.
-            </p>
+            <h1>{site.heroTitle}</h1>
+            <p className="hero-lead">{site.heroLead}</p>
 
             <form className="search-bar" onSubmit={search} role="search">
               <label className="input-icon">
@@ -69,12 +66,25 @@ export default function Home() {
               <button className="btn btn-lg">Search jobs</button>
             </form>
 
-            <div className="popular">
-              <span>Popular:</span>
-              {POPULAR.map((p) => (
-                <Link key={p} to={`/jobs?keyword=${encodeURIComponent(p)}`}>{p}</Link>
-              ))}
-            </div>
+            {(skills.length > 0 || cities.length > 0) && (
+              <div className="popular">
+                <span>Popular:</span>
+                {skills.map((p) => (
+                  <Link key={`k-${p}`} to={`/jobs?keyword=${encodeURIComponent(p)}`}>{p}</Link>
+                ))}
+                {cities.map((p) => (
+                  <Link key={`l-${p}`} to={`/jobs?location=${encodeURIComponent(p)}`}>{p}</Link>
+                ))}
+              </div>
+            )}
+
+            {stats && (
+              <dl className="hero-stats">
+                <div><dt>Open jobs</dt><dd>{stats.openJobs}</dd></div>
+                <div><dt>Companies hiring</dt><dd>{stats.hiringCompanies}</dd></div>
+                <div><dt>Candidates</dt><dd>{stats.candidates}</dd></div>
+              </dl>
+            )}
           </div>
 
           {latest.length > 0 && (
@@ -114,7 +124,9 @@ export default function Home() {
                 <span>
                   {t.label}
                   <br />
-                  <small>View openings</small>
+                  <small>
+                    {overview ? (typeCounts[t.value] ? plural(typeCounts[t.value], 'opening') : 'No openings yet') : 'View openings'}
+                  </small>
                 </span>
               </Link>
             ))}
@@ -144,20 +156,42 @@ export default function Home() {
           )}
         </section>
 
+        {companies.length > 0 && (
+          <section className="section">
+            <div className="section-head">
+              <div>
+                <h2>Companies hiring now</h2>
+                <p className="muted">Based on current open positions</p>
+              </div>
+            </div>
+            <div className="company-grid">
+              {companies.map((c) => (
+                <Link key={c.id} to={`/jobs?keyword=${encodeURIComponent(c.name)}`} className="company-tile">
+                  <span className="avatar avatar-lg">
+                    {c.logo ? <img src={fileUrl(c.logo)} alt="" loading="lazy" /> : initials(c.name)}
+                  </span>
+                  <strong>{c.name}</strong>
+                  <small className="muted">{plural(c.openJobs, 'opening')}{c.location ? ` · ${c.location}` : ''}</small>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="section">
           <div className="section-head"><h2>Built for both sides of hiring</h2></div>
           <div className="audience">
             <div className="card">
               <h3>For candidates</h3>
               <ul>
-                {CANDIDATE_POINTS.map((p) => (<li key={p}><Icon name="check" size={18} /><span>{p}</span></li>))}
+                {lines(site.candidatePoints).map((p) => (<li key={p}><Icon name="check" size={18} /><span>{p}</span></li>))}
               </ul>
               <Link to="/register" className="btn">Create candidate account</Link>
             </div>
             <div className="card dark">
               <h3>For recruiters</h3>
               <ul>
-                {RECRUITER_POINTS.map((p) => (<li key={p}><Icon name="check" size={18} /><span>{p}</span></li>))}
+                {lines(site.recruiterPoints).map((p) => (<li key={p}><Icon name="check" size={18} /><span>{p}</span></li>))}
               </ul>
               <Link to="/register?role=recruiter" className="btn btn-accent">Start hiring</Link>
             </div>
@@ -173,8 +207,8 @@ export default function Home() {
             </>
           ) : (
             <>
-              <h2>Ready to get started?</h2>
-              <p>Join as a candidate to apply, or as a recruiter to start hiring.</p>
+              <h2>{site.ctaTitle}</h2>
+              <p>{site.ctaText}</p>
               <div className="row" style={{ justifyContent: 'center' }}>
                 <Link to="/register" className="btn btn-lg">Create free account</Link>
                 <Link to="/login" className="btn btn-outline btn-lg">Log in</Link>

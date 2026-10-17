@@ -14,6 +14,7 @@ import com.jobportal.repository.CompanyRepository;
 import com.jobportal.repository.JobRepository;
 import com.jobportal.repository.UserRepository;
 import com.jobportal.service.JobService;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -177,7 +178,8 @@ public class JobServiceImpl implements JobService {
                     p.add(cb.or(
                             cb.like(cb.lower(root.get("title")), like, '\\'),
                             cb.like(cb.lower(root.get("skills")), like, '\\'),
-                            cb.like(cb.lower(root.get("description")), like, '\\')));
+                            cb.like(cb.lower(root.get("description")), like, '\\'),
+                            cb.like(cb.lower(root.join("company", JoinType.LEFT).get("name")), like, '\\')));
                 }
                 if (hasText(f.location())) {
                     String like = "%" + escape(f.location().trim().toLowerCase(Locale.ROOT)) + "%";

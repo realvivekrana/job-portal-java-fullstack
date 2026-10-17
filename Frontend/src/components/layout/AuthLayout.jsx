@@ -1,27 +1,24 @@
 import { Link, Outlet } from 'react-router-dom'
 import Brand from '../common/Brand'
 import Icon from '../common/Icon'
-
-const POINTS = [
-  'Search openings and apply with one saved resume',
-  'Post jobs and shortlist applicants in one place',
-  'Get email updates when your application status changes',
-]
+import useSite from '../../hooks/useSite'
+import { lines } from '../../utils/helpers'
 
 export default function AuthLayout() {
+  const { site } = useSite()
   return (
     <div className="auth-shell">
       <aside className="auth-aside">
         <Brand light />
         <div>
-          <h2>Your next role, or your next hire, starts here.</h2>
+          <h2>{site.authHeadline}</h2>
           <ul>
-            {POINTS.map((p) => (
+            {lines(site.authPoints).map((p) => (
               <li key={p}><Icon name="check" size={18} /> <span>{p}</span></li>
             ))}
           </ul>
         </div>
-        <span className="small">© {new Date().getFullYear()} JobPortal</span>
+        <span className="small">© {new Date().getFullYear()} {site.siteName}</span>
       </aside>
 
       <div className="auth-main">

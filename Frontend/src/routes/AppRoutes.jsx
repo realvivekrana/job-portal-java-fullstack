@@ -26,6 +26,7 @@ import JobApplicants from '../pages/recruiter/JobApplicants'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import ManageUsers from '../pages/admin/ManageUsers'
 import ManageJobs from '../pages/admin/ManageJobs'
+import ManageSite from '../pages/admin/ManageSite'
 
 export default function AppRoutes() {
   return (
@@ -63,6 +64,7 @@ export default function AppRoutes() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<ManageUsers />} />
             <Route path="/admin/jobs" element={<ManageJobs />} />
+            <Route path="/admin/site" element={<ManageSite />} />
           </Route>
         </Route>
       </Route>

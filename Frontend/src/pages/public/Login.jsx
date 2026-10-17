@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../../components/common/Icon'
 import useAuth from '../../hooks/useAuth'
+import useSite from '../../hooks/useSite'
 import useToast from '../../hooks/useToast'
 import { ROLE_HOME } from '../../utils/constants'
 import { getErrorMessage } from '../../utils/helpers'
 
 export default function Login() {
   const { login, isAuthenticated, user } = useAuth()
+  const { site } = useSite()
   const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,7 +39,7 @@ export default function Login() {
   return (
     <div className="auth-card">
       <h1>Welcome back</h1>
-      <p className="muted">Log in to continue to JobPortal.</p>
+      <p className="muted">Log in to continue to {site.siteName}.</p>
 
       {searchParams.get('expired') && (
         <div className="alert alert-info" style={{ marginBottom: '1rem' }}>

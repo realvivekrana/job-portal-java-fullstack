@@ -20,6 +20,7 @@ export default function AdminDashboard() {
         <div className="row">
           <Link to="/admin/users" className="btn btn-outline"><Icon name="users" size={17} /> Manage users</Link>
           <Link to="/admin/jobs" className="btn btn-outline"><Icon name="briefcase" size={17} /> Manage jobs</Link>
+          <Link to="/admin/site" className="btn btn-outline"><Icon name="globe" size={17} /> Website content</Link>
         </div>
       </div>
 

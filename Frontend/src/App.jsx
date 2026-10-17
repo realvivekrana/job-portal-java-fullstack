@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { SiteProvider } from './context/SiteContext'
 import { ToastProvider } from './context/ToastContext'
 import AppRoutes from './routes/AppRoutes'
 
@@ -14,13 +15,15 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <ScrollToTop />
-        <div className="app">
-          <AppRoutes />
-        </div>
-      </ToastProvider>
-    </AuthProvider>
+    <SiteProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <ScrollToTop />
+          <div className="app">
+            <AppRoutes />
+          </div>
+        </ToastProvider>
+      </AuthProvider>
+    </SiteProvider>
   )
 }

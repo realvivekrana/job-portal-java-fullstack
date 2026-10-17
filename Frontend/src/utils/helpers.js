@@ -83,3 +83,15 @@ export function validateFile(file, extensions, maxSize) {
   if (file.size > maxSize) return `File must be ${Math.round(maxSize / 1024 / 1024)} MB or smaller`
   return null
 }
+
+// "one\ntwo\n\nthree" -> ['one', 'two', 'three']
+export function lines(text) {
+  return (text || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+}
+
+export function plural(n, word) {
+  return `${n} ${word}${n === 1 ? '' : 's'}`
+}

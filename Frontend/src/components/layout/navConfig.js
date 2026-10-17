@@ -31,6 +31,7 @@ export const SIDEBAR = {
       items: [
         { to: '/admin/users', label: 'Users', icon: 'users' },
         { to: '/admin/jobs', label: 'Jobs', icon: 'briefcase' },
+        { to: '/admin/site', label: 'Website content', icon: 'globe' },
       ],
     },
   ],
@@ -54,6 +55,7 @@ const TITLES = [
   [/^\/candidate\/dashboard/, 'Dashboard'],
   [/^\/admin\/users/, 'Users'],
   [/^\/admin\/jobs/, 'Jobs'],
+  [/^\/admin\/site/, 'Website content'],
   [/^\/admin\/dashboard/, 'Dashboard'],
 ]
 
