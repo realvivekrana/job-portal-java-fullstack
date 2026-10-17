@@ -1,0 +1,25 @@
+# Is file ko copy karke application-dev.properties banao aur apni values daalo
+
+spring.datasource.url=jdbc:mysql://localhost:3306/jobportal_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=YOUR_MYSQL_PASSWORD
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+app.jwt.secret=YOUR_BASE64_SECRET_KEY
+app.jwt.expiration-ms=86400000
+
+app.upload.dir=uploads
+app.upload.resume-dir=uploads/resumes
+app.upload.logo-dir=uploads/logos
+
+app.cors.allowed-origins=http://localhost:5173
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=YOUR_GMAIL@gmail.com
+spring.mail.password=YOUR_GMAIL_APP_PASSWORD
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+app.mail.from=YOUR_GMAIL@gmail.com

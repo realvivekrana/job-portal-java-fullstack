@@ -1,0 +1,8 @@
+target/
+.idea/
+.vscode/
+*.iml
+uploads/
+application-dev.properties
+application-prod.properties
+HELP.md

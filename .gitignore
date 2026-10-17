@@ -1,0 +1,19 @@
+# Dependencies / build
+node_modules/
+target/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Secrets (DB password, JWT secret, mail password)
+.env
+Backend/src/main/resources/application-dev.properties
+Backend/src/main/resources/application-prod.properties
+
+# Uploads / logs / OS
+uploads/
+*.log
+.DS_Store
