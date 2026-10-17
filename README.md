@@ -34,10 +34,18 @@ In production (or Docker) use environment variables instead:
 ### Frontend
 ```bash
 cd Frontend
+cp .env.example .env     # set VITE_API_URL if the backend is not on http://localhost:8080
 npm install
 npm run dev
 ```
-Runs on `http://localhost:5173`
+Runs on `http://localhost:5173`. Production build: `npm run build` (output in `Frontend/dist`).
+For a deployed frontend, add its URL to `CORS_ALLOWED_ORIGINS` on the backend.
+
+**Pages**
+- Public: Home, job search with filters / sorting / pagination, job details, login, register
+- Candidate: dashboard, profile + resume upload, apply with cover letter, my applications (withdraw)
+- Recruiter: dashboard, company profile + logo, post / edit / close jobs, applicants (filter, shortlist, hire, reject, view resume)
+- Admin: dashboard stats, users (enable / disable), jobs (close, reopen, delete)
 
 ## API Overview
 All responses use `{ "success": true|false, "message": "...", "data": ... }`.
