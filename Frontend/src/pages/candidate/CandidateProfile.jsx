@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from '../../components/common/Icon'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
 import useApi from '../../hooks/useApi'
@@ -130,7 +131,7 @@ function ResumeCard({ profile, onChange }) {
       <p className="muted small">PDF, DOC or DOCX, up to 5 MB. Used automatically when you apply for jobs.</p>
       {profile.resumeUrl ? (
         <div className="file-row">
-          <span>📄 Resume uploaded</span>
+          <span><Icon name="file" size={18} /> Resume uploaded</span>
           <div className="actions">
             <button className="btn btn-outline btn-sm" onClick={view}>View</button>
             <button className="btn btn-danger btn-sm" onClick={remove} disabled={busy}>Remove</button>
@@ -154,19 +155,19 @@ export default function CandidateProfile() {
   const profile = override || data
 
   if (loading && !profile) return <Loader page />
-  if (error && !profile) return <div className="container page"><ErrorState error={error} onRetry={reload} /></div>
+  if (error && !profile) return <div className="dash-page"><ErrorState error={error} onRetry={reload} /></div>
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>My profile</h1>
           <p>{profile.name} · {profile.email}</p>
         </div>
       </div>
-      <div className="stack">
-        <ResumeCard profile={profile} onChange={setOverride} />
+      <div className="split">
         <ProfileForm initial={profile} onSaved={setOverride} />
+        <ResumeCard profile={profile} onChange={setOverride} />
       </div>
     </div>
   )

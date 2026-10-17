@@ -5,6 +5,7 @@ import JobFilters from '../../components/job/JobFilters'
 import Pagination from '../../components/common/Pagination'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
+import Icon from '../../components/common/Icon'
 import EmptyState from '../../components/common/EmptyState'
 import useApi from '../../hooks/useApi'
 import useDebounce from '../../hooks/useDebounce'
@@ -19,6 +20,7 @@ export default function JobListing() {
     ...DEFAULTS,
     keyword: searchParams.get('keyword') || '',
     location: searchParams.get('location') || '',
+    jobType: searchParams.get('jobType') || '',
   }))
   const [page, setPage] = useState(0)
   const debounced = useDebounce(filters, 400)
@@ -69,8 +71,8 @@ export default function JobListing() {
           {data && (
             <div style={{ opacity: loading ? 0.55 : 1, transition: 'opacity .15s' }}>
               {data.content.length === 0 ? (
-                <EmptyState icon="🔎" title="No jobs match your search" text="Try different keywords or clear some filters.">
-                  <button className="btn btn-outline" onClick={reset}>Clear filters</button>
+                <EmptyState icon="search" title="No jobs match your search" text="Try different keywords or clear some filters.">
+                  <button className="btn btn-outline" onClick={reset}><Icon name="x" size={16} /> Clear filters</button>
                 </EmptyState>
               ) : (
                 <div className="job-list single">

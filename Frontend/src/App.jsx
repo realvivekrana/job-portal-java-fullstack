@@ -2,8 +2,6 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
-import Navbar from './components/common/Navbar'
-import Footer from './components/common/Footer'
 import AppRoutes from './routes/AppRoutes'
 
 function ScrollToTop() {
@@ -20,11 +18,7 @@ export default function App() {
       <ToastProvider>
         <ScrollToTop />
         <div className="app">
-          <Navbar />
-          <main className="app-main">
-            <AppRoutes />
-          </main>
-          <Footer />
+          <AppRoutes />
         </div>
       </ToastProvider>
     </AuthProvider>

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import StatusBadge from './StatusBadge'
+import Icon from '../common/Icon'
 import { openResume } from '../../api/applicationApi'
 import { STATUS_TRANSITIONS } from '../../utils/constants'
-import { formatDate, getErrorMessage, jobTypeLabel } from '../../utils/helpers'
+import { formatDate, getErrorMessage, initials, jobTypeLabel } from '../../utils/helpers'
 import useToast from '../../hooks/useToast'
 
 /** variant="candidate" shows the job; variant="recruiter" shows the applicant. */
@@ -29,7 +30,9 @@ export default function ApplicationCard({ application, variant = 'candidate', on
   return (
     <article className="card app-card">
       <div className="app-card-head">
-        <div>
+        <div className="app-card-id">
+          <span className="avatar avatar-lg">{initials(variant === 'candidate' ? a.companyName : c.name)}</span>
+          <div style={{ minWidth: 0 }}>
           {variant === 'candidate' ? (
             <>
               <h3 style={{ margin: 0 }}><Link to={`/jobs/${a.jobId}`}>{a.jobTitle}</Link></h3>
@@ -43,6 +46,7 @@ export default function ApplicationCard({ application, variant = 'candidate', on
               <span className="muted small">{c.email}</span>
             </>
           )}
+          </div>
         </div>
         <StatusBadge status={a.status} />
       </div>
@@ -59,7 +63,7 @@ export default function ApplicationCard({ application, variant = 'candidate', on
         </dl>
       )}
 
-      <div className="muted small">Applied on {formatDate(a.appliedAt)}</div>
+      <div className="muted small row" style={{ gap: '.4rem' }}><Icon name="clock" size={14} /> Applied on {formatDate(a.appliedAt)}</div>
 
       {a.coverLetter && (
         <div>
@@ -73,13 +77,13 @@ export default function ApplicationCard({ application, variant = 'candidate', on
       <div className="actions">
         {a.resumeUrl && (
           <button className="btn btn-outline btn-sm" onClick={viewResume} disabled={opening}>
-            {opening ? 'Opening...' : 'View resume'}
+            <Icon name="file" size={15} /> {opening ? 'Opening...' : 'View resume'}
           </button>
         )}
 
         {variant === 'candidate' && a.status === 'APPLIED' && (
           <button className="btn btn-danger btn-sm" disabled={busy} onClick={() => onWithdraw(a)}>
-            Withdraw
+            <Icon name="trash" size={15} /> Withdraw
           </button>
         )}
 

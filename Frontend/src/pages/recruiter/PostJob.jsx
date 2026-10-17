@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
+import EmptyState from '../../components/common/EmptyState'
 import JobForm from '../../components/job/JobForm'
 import useApi from '../../hooks/useApi'
 import useToast from '../../hooks/useToast'
@@ -22,19 +23,14 @@ export default function PostJob() {
   const job = useApi(() => (isEdit ? getJob(id) : Promise.resolve(null)), [id])
 
   if ((company.loading && !company.data) || (job.loading && !job.data)) return <Loader page />
-  if (company.error) return <div className="container page"><ErrorState error={company.error} onRetry={company.reload} /></div>
-  if (job.error) return <div className="container page"><ErrorState error={job.error} onRetry={job.reload} /></div>
+  if (company.error) return <div className="dash-page"><ErrorState error={company.error} onRetry={company.reload} /></div>
+  if (job.error) return <div className="dash-page"><ErrorState error={job.error} onRetry={job.reload} /></div>
 
   if (!company.data) {
     return (
-      <div className="container page">
-        <div className="empty">
-          <div className="empty-icon">🏢</div>
-          <h3>Create your company first</h3>
-          <p>You need a company profile before you can post jobs.</p>
+      <EmptyState icon="building" title="Create your company first" text="You need a company profile before you can post jobs.">
           <Link to="/recruiter/company" className="btn">Create company</Link>
-        </div>
-      </div>
+        </EmptyState>
     )
   }
 
@@ -58,7 +54,7 @@ export default function PostJob() {
   }
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <BackButton fallback="/recruiter/jobs" />
       <div className="page-header">
         <div>

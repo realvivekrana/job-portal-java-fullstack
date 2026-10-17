@@ -1,14 +1,12 @@
-import { getErrorMessage } from '../../utils/helpers'
+import Icon, { hasIcon } from './Icon'
 
-export default function ErrorState({ error, onRetry }) {
+export default function EmptyState({ icon = 'search', title, text, children }) {
   return (
-    <div className="alert alert-error row row-between">
-      <span>{getErrorMessage(error)}</span>
-      {onRetry && (
-        <button className="btn btn-outline btn-sm" onClick={onRetry}>
-          Try again
-        </button>
-      )}
+    <div className="empty">
+      <div className="empty-icon">{hasIcon(icon) ? <Icon name={icon} size={28} /> : icon}</div>
+      <h3>{title}</h3>
+      {text && <p>{text}</p>}
+      {children}
     </div>
   )
 }

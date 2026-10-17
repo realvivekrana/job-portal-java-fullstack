@@ -1,27 +1,11 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
-import { ROLES } from '../../utils/constants'
+import { ROLE_HOME } from '../../utils/constants'
 import { initials } from '../../utils/helpers'
-
-const LINKS = {
-  [ROLES.CANDIDATE]: [
-    { to: '/candidate/dashboard', label: 'Dashboard' },
-    { to: '/candidate/applications', label: 'My Applications' },
-    { to: '/candidate/profile', label: 'My Profile' },
-  ],
-  [ROLES.RECRUITER]: [
-    { to: '/recruiter/dashboard', label: 'Dashboard' },
-    { to: '/recruiter/jobs', label: 'My Jobs' },
-    { to: '/recruiter/jobs/new', label: 'Post a Job' },
-    { to: '/recruiter/company', label: 'Company' },
-  ],
-  [ROLES.ADMIN]: [
-    { to: '/admin/dashboard', label: 'Dashboard' },
-    { to: '/admin/users', label: 'Users' },
-    { to: '/admin/jobs', label: 'Jobs' },
-  ],
-}
+import { roleLabel } from '../layout/navConfig'
+import Brand from './Brand'
+import Icon from './Icon'
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth()
@@ -36,34 +20,29 @@ export default function Navbar() {
   }
 
   const linkClass = ({ isActive }) => `nav-link${isActive ? ' active' : ''}`
-  const roleLinks = isAuthenticated ? LINKS[user.role] || [] : []
 
   return (
     <header className="navbar">
       <div className="container navbar-inner">
-        <Link to="/" className="brand" onClick={close}>
-          <span className="brand-mark">J</span> JobPortal
-        </Link>
+        <Brand onClick={close} />
 
         <button
           type="button"
-          className="nav-toggle"
-          aria-label="Toggle menu"
+          className="icon-btn nav-toggle"
+          aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? '✕' : '☰'}
+          <Icon name={open ? 'x' : 'menu'} size={20} />
         </button>
 
-        <nav className={`nav-menu${open ? ' open' : ''}`}>
+        <nav className={`nav-menu${open ? ' open' : ''}`} aria-label="Main">
           <div className="nav-links">
             <NavLink to="/" end className={linkClass} onClick={close}>Home</NavLink>
-            <NavLink to="/jobs" className={linkClass} onClick={close}>Find Jobs</NavLink>
-            {roleLinks.map((l) => (
-              <NavLink key={l.to} to={l.to} end className={linkClass} onClick={close}>
-                {l.label}
-              </NavLink>
-            ))}
+            <NavLink to="/jobs" className={linkClass} onClick={close}>Find jobs</NavLink>
+            {!isAuthenticated && (
+              <NavLink to="/register?role=recruiter" className="nav-link" onClick={close}>For recruiters</NavLink>
+            )}
           </div>
 
           <div className="nav-actions">
@@ -74,15 +53,20 @@ export default function Navbar() {
                   <span>
                     <strong>{user.name}</strong>
                     <br />
-                    <span className="muted small">{user.role.charAt(0) + user.role.slice(1).toLowerCase()}</span>
+                    <span className="muted small">{roleLabel(user.role)}</span>
                   </span>
                 </div>
-                <button className="btn btn-outline btn-sm" onClick={handleLogout}>Logout</button>
+                <Link to={ROLE_HOME[user.role] || '/'} className="btn btn-sm" onClick={close}>
+                  <Icon name="dashboard" size={16} /> Dashboard
+                </Link>
+                <button type="button" className="btn btn-outline btn-sm" onClick={handleLogout}>
+                  <Icon name="logout" size={16} /> Log out
+                </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="btn btn-outline btn-sm" onClick={close}>Login</Link>
-                <Link to="/register" className="btn btn-sm" onClick={close}>Sign up</Link>
+                <Link to="/login" className="btn btn-outline btn-sm" onClick={close}>Log in</Link>
+                <Link to="/register" className="btn btn-sm" onClick={close}>Sign up free</Link>
               </>
             )}
           </div>

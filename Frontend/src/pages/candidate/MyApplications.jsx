@@ -35,7 +35,7 @@ export default function MyApplications() {
   }
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>My applications</h1>
@@ -47,7 +47,7 @@ export default function MyApplications() {
       {error && <ErrorState error={error} onRetry={reload} />}
       {!data && loading && <Loader />}
       {data && data.content.length === 0 && (
-        <EmptyState icon="📝" title="You have not applied to any job yet" text="Your applications will show up here.">
+        <EmptyState icon="send" title="You have not applied to any job yet" text="Your applications will show up here.">
           <Link to="/jobs" className="btn">Browse jobs</Link>
         </EmptyState>
       )}

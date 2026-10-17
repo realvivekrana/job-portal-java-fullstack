@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
+import Icon from '../../components/common/Icon'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
+import EmptyState from '../../components/common/EmptyState'
 import JobDetails, { JobSummary } from '../../components/job/JobDetails'
 import ApplyModal from '../../components/application/ApplyModal'
 import useApi from '../../hooks/useApi'
@@ -10,7 +12,7 @@ import useAuth from '../../hooks/useAuth'
 import { getJob } from '../../api/jobApi'
 import { getCompany } from '../../api/companyApi'
 import { ROLES } from '../../utils/constants'
-import { fileUrl, formatSalary, initials, jobTypeLabel } from '../../utils/helpers'
+import { fileUrl, formatSalary, initials, jobTypeLabel, timeAgo } from '../../utils/helpers'
 
 export default function JobDetailsPage() {
   const { id } = useParams()
@@ -33,12 +35,9 @@ export default function JobDetailsPage() {
       <div className="container page">
         <BackButton fallback="/jobs" />
         {notFound ? (
-          <div className="empty">
-            <div className="empty-icon">🫥</div>
-            <h3>Job not found</h3>
-            <p>This job may have been removed.</p>
+          <EmptyState icon="search" title="Job not found" text="This job may have been removed.">
             <Link to="/jobs" className="btn">Browse jobs</Link>
-          </div>
+          </EmptyState>
         ) : (
           <ErrorState error={error} onRetry={reload} />
         )}
@@ -48,13 +47,16 @@ export default function JobDetailsPage() {
   if (!job) return null
 
   const logo = fileUrl(company?.logo)
+  const canApply = job.active && isAuthenticated && user.role === ROLES.CANDIDATE && !applied
+  const guestCanApply = job.active && !isAuthenticated
+  const showBar = canApply || guestCanApply
 
   const renderAction = () => {
     if (!job.active) return <div className="alert alert-warning">This job is no longer accepting applications.</div>
     if (!isAuthenticated) {
       return (
-        <Link to="/login" state={{ from: location.pathname }} className="btn btn-block">
-          Login to apply
+        <Link to="/login" state={{ from: location.pathname }} className="btn btn-block btn-lg">
+          Log in to apply
         </Link>
       )
     }
@@ -64,30 +66,38 @@ export default function JobDetailsPage() {
     if (applied) {
       return (
         <div className="stack">
-          <div className="alert alert-success">Application submitted. Good luck!</div>
+          <div className="alert alert-success"><Icon name="check" size={18} /> Application submitted. Good luck!</div>
           <Link to="/candidate/applications" className="btn btn-outline btn-block">Track my applications</Link>
         </div>
       )
     }
-    return <button className="btn btn-block" onClick={() => setApplying(true)}>Apply now</button>
+    return <button className="btn btn-block btn-lg" onClick={() => setApplying(true)}>Apply now</button>
   }
 
   return (
-    <div className="container page">
+    <div className={`container page${showBar ? ' has-apply-bar' : ''}`}>
       <BackButton fallback="/jobs" />
 
-      <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <div className="logo-box">
-          <span className="avatar avatar-lg">
+      <div className="card job-hero">
+        <div className="job-hero-top">
+          <span className="avatar avatar-xl">
             {logo ? <img src={logo} alt={`${job.companyName} logo`} /> : initials(job.companyName)}
           </span>
           <div>
-            <h1 style={{ margin: 0 }}>{job.title}</h1>
-            <p className="muted" style={{ margin: 0 }}>
-              {job.companyName} · {job.location} · {jobTypeLabel(job.jobType)}
-            </p>
-            <p style={{ margin: '.25rem 0 0', fontWeight: 600 }}>💰 {formatSalary(job.salaryMin, job.salaryMax)}</p>
+            <h1>{job.title}</h1>
+            <div className="job-meta">
+              <span><Icon name="building" size={15} /> {job.companyName}</span>
+              <span><Icon name="pin" size={15} /> {job.location}</span>
+              <span><Icon name="briefcase" size={15} /> {jobTypeLabel(job.jobType)}</span>
+              <span><Icon name="clock" size={15} /> {timeAgo(job.createdAt)}</span>
+            </div>
           </div>
+        </div>
+        <div>
+          <div className="muted small">Salary</div>
+          <strong style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>
+            {formatSalary(job.salaryMin, job.salaryMax)}
+          </strong>
         </div>
       </div>
 
@@ -96,8 +106,9 @@ export default function JobDetailsPage() {
 
         <aside className="stack">
           <div className="card">
-            {renderAction()}
-            <div className="mt"><JobSummary job={job} /></div>
+            {showBar ? <div className="desk-only">{renderAction()}<div className="mt" /></div> : renderAction()}
+            {!showBar && <div className="mt" />}
+            <JobSummary job={job} />
           </div>
 
           {company && (
@@ -120,6 +131,20 @@ export default function JobDetailsPage() {
           )}
         </aside>
       </div>
+
+      {showBar && (
+        <div className="apply-bar">
+          <div>
+            <div className="small muted">Salary</div>
+            <strong>{formatSalary(job.salaryMin, job.salaryMax)}</strong>
+          </div>
+          {canApply ? (
+            <button className="btn" onClick={() => setApplying(true)}>Apply now</button>
+          ) : (
+            <Link to="/login" state={{ from: location.pathname }} className="btn">Log in to apply</Link>
+          )}
+        </div>
+      )}
 
       {applying && (
         <ApplyModal

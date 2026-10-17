@@ -68,3 +68,9 @@ Application status flow: `APPLIED` → `SHORTLISTED` or `REJECTED`; `SHORTLISTED
 
 ## Author
 Vivek Kumar Rana
+
+## UI notes
+- Mobile-first responsive design (phones, tablets, desktops)
+- Candidate, Recruiter and Admin dashboards share a sidebar layout (fixed on desktop, slide-in drawer on mobile/tablet)
+- Tables turn into cards on small screens; job details has a sticky Apply bar on mobile
+- Fonts (Bricolage Grotesque, DM Sans) load from Google Fonts with system fallbacks

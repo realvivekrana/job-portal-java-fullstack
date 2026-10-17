@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Icon from '../../components/common/Icon'
 import Pagination from '../../components/common/Pagination'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
@@ -55,7 +56,7 @@ export default function ManageJobs() {
   const isDelete = target?.action === 'delete'
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>Jobs</h1>
@@ -63,9 +64,12 @@ export default function ManageJobs() {
         </div>
       </div>
 
-      <div className="row" style={{ marginBottom: '1rem' }}>
-        <input className="input" style={{ maxWidth: 320 }} placeholder="Search by title or company" value={keyword}
-          onChange={(e) => { setKeyword(e.target.value); setPage(0) }} aria-label="Search jobs" />
+      <div className="toolbar">
+        <span className="input-icon" style={{ maxWidth: 360, width: '100%' }}>
+          <Icon name="search" size={18} />
+          <input className="input" placeholder="Search by title or company" value={keyword}
+            onChange={(e) => { setKeyword(e.target.value); setPage(0) }} aria-label="Search jobs" />
+        </span>
       </div>
       <div className="tabs">
         {STATUS_FILTERS.map((f) => (
@@ -76,24 +80,24 @@ export default function ManageJobs() {
 
       {error && <ErrorState error={error} onRetry={reload} />}
       {!data && loading && <Loader />}
-      {data && data.content.length === 0 && <EmptyState icon="💼" title="No jobs found" />}
+      {data && data.content.length === 0 && <EmptyState icon="briefcase" title="No jobs found" />}
       {data && data.content.length > 0 && (
         <div style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="table-wrap">
-            <table>
+            <table className="responsive">
               <thead>
                 <tr><th>Title</th><th>Company</th><th>Location</th><th>Type</th><th>Posted</th><th>Status</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {data.content.map((j) => (
                   <tr key={j.id}>
-                    <td className="wrap"><Link to={`/jobs/${j.id}`}>{j.title}</Link></td>
-                    <td>{j.companyName}</td>
-                    <td>{j.location}</td>
-                    <td>{jobTypeLabel(j.jobType)}</td>
-                    <td>{formatDate(j.createdAt)}</td>
-                    <td><span className={`badge ${j.active ? 'badge-active' : 'badge-closed'}`}>{j.active ? 'Open' : 'Closed'}</span></td>
-                    <td>
+                    <td className="wrap" data-label="Title"><Link to={`/jobs/${j.id}`}>{j.title}</Link></td>
+                    <td data-label="Company">{j.companyName}</td>
+                    <td data-label="Location">{j.location}</td>
+                    <td data-label="Type">{jobTypeLabel(j.jobType)}</td>
+                    <td data-label="Posted">{formatDate(j.createdAt)}</td>
+                    <td data-label="Status"><span className={`badge ${j.active ? 'badge-active' : 'badge-closed'}`}>{j.active ? 'Open' : 'Closed'}</span></td>
+                    <td data-label="Actions">
                       <div className="actions">
                         <button className="btn btn-outline btn-sm" onClick={() => setTarget({ job: j, action: 'toggle' })}>
                           {j.active ? 'Close' : 'Reopen'}

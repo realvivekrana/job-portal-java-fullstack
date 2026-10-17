@@ -32,7 +32,7 @@ export default function MyJobs() {
   }
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>My jobs</h1>
@@ -44,27 +44,27 @@ export default function MyJobs() {
       {error && <ErrorState error={error} onRetry={reload} />}
       {!data && loading && <Loader />}
       {data && data.content.length === 0 && (
-        <EmptyState icon="💼" title="You have not posted any jobs" text="Post a job to start receiving applications.">
+        <EmptyState icon="briefcase" title="You have not posted any jobs" text="Post a job to start receiving applications.">
           <Link to="/recruiter/jobs/new" className="btn">Post a job</Link>
         </EmptyState>
       )}
       {data && data.content.length > 0 && (
         <div style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="table-wrap">
-            <table>
+            <table className="responsive">
               <thead>
                 <tr><th>Title</th><th>Location</th><th>Type</th><th>Salary</th><th>Posted</th><th>Status</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {data.content.map((j) => (
                   <tr key={j.id}>
-                    <td className="wrap"><Link to={`/jobs/${j.id}`}>{j.title}</Link></td>
-                    <td>{j.location}</td>
-                    <td>{jobTypeLabel(j.jobType)}</td>
-                    <td>{formatSalary(j.salaryMin, j.salaryMax)}</td>
-                    <td>{formatDate(j.createdAt)}</td>
-                    <td><span className={`badge ${j.active ? 'badge-active' : 'badge-closed'}`}>{j.active ? 'Open' : 'Closed'}</span></td>
-                    <td>
+                    <td className="wrap" data-label="Title"><Link to={`/jobs/${j.id}`}>{j.title}</Link></td>
+                    <td data-label="Location">{j.location}</td>
+                    <td data-label="Type">{jobTypeLabel(j.jobType)}</td>
+                    <td data-label="Salary">{formatSalary(j.salaryMin, j.salaryMax)}</td>
+                    <td data-label="Posted">{formatDate(j.createdAt)}</td>
+                    <td data-label="Status"><span className={`badge ${j.active ? 'badge-active' : 'badge-closed'}`}>{j.active ? 'Open' : 'Closed'}</span></td>
+                    <td data-label="Actions">
                       <div className="actions">
                         <Link to={`/recruiter/jobs/${j.id}/applicants`} className="btn btn-outline btn-sm">Applicants</Link>
                         <Link to={`/recruiter/jobs/${j.id}/edit`} className="btn btn-outline btn-sm">Edit</Link>

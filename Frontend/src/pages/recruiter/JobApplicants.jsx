@@ -54,7 +54,7 @@ export default function JobApplicants() {
   }
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <BackButton fallback="/recruiter/jobs" />
       <div className="page-header">
         <div>
@@ -75,7 +75,7 @@ export default function JobApplicants() {
       {error && <ErrorState error={error} onRetry={reload} />}
       {!data && loading && <Loader />}
       {data && data.content.length === 0 && (
-        <EmptyState icon="👥" title="No applicants here yet" text={status ? 'No applications with this status.' : 'Applications will appear here as candidates apply.'} />
+        <EmptyState icon="users" title="No applicants here yet" text={status ? 'No applications with this status.' : 'Applications will appear here as candidates apply.'} />
       )}
       {data && data.content.length > 0 && (
         <div className="stack" style={{ opacity: loading ? 0.6 : 1 }}>

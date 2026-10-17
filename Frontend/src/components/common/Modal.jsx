@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import Icon from './Icon'
 
 export default function Modal({ title, onClose, children }) {
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function Modal({ title, onClose, children }) {
         <div className="modal-head">
           <h3>{title}</h3>
           <button type="button" className="modal-close" aria-label="Close" onClick={onClose}>
-            ×
+            <Icon name="x" size={18} />
           </button>
         </div>
         {children}

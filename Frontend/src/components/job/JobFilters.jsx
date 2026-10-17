@@ -1,14 +1,19 @@
 import { useState } from 'react'
+import Icon from '../common/Icon'
 import { JOB_TYPES, SORT_OPTIONS } from '../../utils/constants'
 
 export default function JobFilters({ filters, onChange, onReset }) {
   const [open, setOpen] = useState(false)
+  const activeCount = ['keyword', 'location', 'jobType', 'minSalary', 'maxExperience'].filter((k) => filters[k]).length
 
   return (
     <aside className="card filters">
       <div className="row row-between">
-        <h3 style={{ margin: 0 }}>Filters</h3>
-        <button type="button" className="btn btn-outline btn-sm filters-toggle" onClick={() => setOpen((v) => !v)}>
+        <h3 style={{ margin: 0 }}>
+          <Icon name="filter" size={17} /> Filters {activeCount > 0 && <span className="badge badge-new">{activeCount}</span>}
+        </h3>
+        <button type="button" className="btn btn-outline btn-sm filters-toggle" aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}>
           {open ? 'Hide' : 'Show'}
         </button>
       </div>

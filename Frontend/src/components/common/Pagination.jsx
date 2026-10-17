@@ -1,3 +1,5 @@
+import Icon from './Icon'
+
 export default function Pagination({ page, totalPages, onChange }) {
   if (!totalPages || totalPages <= 1) return null
 
@@ -9,7 +11,7 @@ export default function Pagination({ page, totalPages, onChange }) {
   return (
     <nav className="pagination" aria-label="Pagination">
       <button className="page-btn" disabled={page === 0} onClick={() => onChange(page - 1)}>
-        ‹ Prev
+        <Icon name="chevL" size={16} /> Prev
       </button>
       {pages.map((p) => (
         <button
@@ -22,7 +24,7 @@ export default function Pagination({ page, totalPages, onChange }) {
         </button>
       ))}
       <button className="page-btn" disabled={page >= totalPages - 1} onClick={() => onChange(page + 1)}>
-        Next ›
+        Next <Icon name="chevR" size={16} />
       </button>
     </nav>
   )

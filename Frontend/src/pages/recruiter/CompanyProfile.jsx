@@ -123,10 +123,10 @@ export default function CompanyProfile() {
   const company = override || data
 
   if (loading && !company && !error) return <Loader page />
-  if (error) return <div className="container page"><ErrorState error={error} onRetry={reload} /></div>
+  if (error) return <div className="dash-page"><ErrorState error={error} onRetry={reload} /></div>
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>{company ? 'Company profile' : 'Create your company'}</h1>
@@ -134,9 +134,9 @@ export default function CompanyProfile() {
         </div>
         {company && <Link to="/recruiter/jobs/new" className="btn">Post a job</Link>}
       </div>
-      <div className="stack">
-        {company && <LogoCard company={company} onChange={setOverride} />}
+      <div className="split">
         <CompanyForm key={company?.id || 'new'} company={company} onSaved={setOverride} />
+        {company && <LogoCard company={company} onChange={setOverride} />}
       </div>
     </div>
   )

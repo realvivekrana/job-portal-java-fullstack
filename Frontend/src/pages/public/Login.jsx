@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import Icon from '../../components/common/Icon'
 import useAuth from '../../hooks/useAuth'
 import useToast from '../../hooks/useToast'
 import { ROLE_HOME } from '../../utils/constants'
@@ -34,40 +35,44 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-wrap">
-      <div className="card auth-card">
-        <h1 className="center">Welcome back</h1>
-        <p className="muted center">Sign in to continue to JobPortal</p>
+    <div className="auth-card">
+      <h1>Welcome back</h1>
+      <p className="muted">Log in to continue to JobPortal.</p>
 
-        {searchParams.get('expired') && (
-          <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
-            Your session has expired. Please sign in again.
-          </div>
-        )}
-        {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{error}</div>}
+      {searchParams.get('expired') && (
+        <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
+          Your session has expired. Please log in again.
+        </div>
+      )}
+      {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{error}</div>}
 
-        <form className="form" onSubmit={submit} noValidate>
-          <div className="field">
-            <label htmlFor="l-email">Email</label>
+      <form className="form" onSubmit={submit} noValidate>
+        <div className="field">
+          <label htmlFor="l-email">Email</label>
+          <span className="input-icon">
+            <Icon name="mail" size={18} />
             <input id="l-email" type="email" className="input" autoComplete="email" value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" />
-          </div>
-          <div className="field">
-            <label htmlFor="l-pass">Password</label>
-            <input id="l-pass" type={showPassword ? 'text' : 'password'} className="input"
+          </span>
+        </div>
+        <div className="field">
+          <label htmlFor="l-pass">Password</label>
+          <span className="input-icon">
+            <input id="l-pass" type={showPassword ? 'text' : 'password'} className="input" style={{ paddingLeft: '.85rem', paddingRight: '3rem' }}
               autoComplete="current-password" value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })} />
-            <label className="small" style={{ fontWeight: 400 }}>
-              <input type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} /> Show password
-            </label>
-          </div>
-          <button className="btn btn-block" disabled={submitting}>{submitting ? 'Signing in...' : 'Sign in'}</button>
-        </form>
+            <button type="button" className="icon-btn pass-toggle" style={{ border: 'none', width: 38, height: 38 }}
+              aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((v) => !v)}>
+              <Icon name={showPassword ? 'eyeOff' : 'eye'} size={18} />
+            </button>
+          </span>
+        </div>
+        <button className="btn btn-block btn-lg" disabled={submitting}>{submitting ? 'Logging in...' : 'Log in'}</button>
+      </form>
 
-        <p className="center small mt">
-          New here? <Link to="/register">Create an account</Link>
-        </p>
-      </div>
+      <p className="center small mt">
+        New here? <Link to="/register">Create an account</Link>
+      </p>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from '../../components/common/Icon'
 import Pagination from '../../components/common/Pagination'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
@@ -48,7 +49,7 @@ export default function ManageUsers() {
   }
 
   return (
-    <div className="container page">
+    <div className="dash-page">
       <div className="page-header">
         <div>
           <h1>Users</h1>
@@ -56,9 +57,12 @@ export default function ManageUsers() {
         </div>
       </div>
 
-      <div className="row" style={{ marginBottom: '1rem' }}>
-        <input className="input" style={{ maxWidth: 320 }} placeholder="Search by name or email" value={keyword}
-          onChange={(e) => { setKeyword(e.target.value); setPage(0) }} aria-label="Search users" />
+      <div className="toolbar">
+        <span className="input-icon" style={{ maxWidth: 360, width: '100%' }}>
+          <Icon name="search" size={18} />
+          <input className="input" placeholder="Search by name or email" value={keyword}
+            onChange={(e) => { setKeyword(e.target.value); setPage(0) }} aria-label="Search users" />
+        </span>
       </div>
       <div className="tabs">
         {ROLE_FILTERS.map((r) => (
@@ -69,23 +73,23 @@ export default function ManageUsers() {
 
       {error && <ErrorState error={error} onRetry={reload} />}
       {!data && loading && <Loader />}
-      {data && data.content.length === 0 && <EmptyState icon="👤" title="No users found" />}
+      {data && data.content.length === 0 && <EmptyState icon="user" title="No users found" />}
       {data && data.content.length > 0 && (
         <div style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="table-wrap">
-            <table>
+            <table className="responsive">
               <thead>
                 <tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
                 {data.content.map((u) => (
                   <tr key={u.id}>
-                    <td>{u.name}</td>
-                    <td>{u.email}</td>
-                    <td><span className="badge badge-neutral">{u.role}</span></td>
-                    <td>{formatDate(u.createdAt)}</td>
-                    <td><span className={`badge ${u.active ? 'badge-active' : 'badge-closed'}`}>{u.active ? 'Active' : 'Disabled'}</span></td>
-                    <td>
+                    <td data-label="Name">{u.name}</td>
+                    <td data-label="Email">{u.email}</td>
+                    <td data-label="Role"><span className="badge badge-neutral">{u.role}</span></td>
+                    <td data-label="Joined">{formatDate(u.createdAt)}</td>
+                    <td data-label="Status"><span className={`badge ${u.active ? 'badge-active' : 'badge-closed'}`}>{u.active ? 'Active' : 'Disabled'}</span></td>
+                    <td data-label="Action">
                       {u.id === me.id ? (
                         <span className="muted small">You</span>
                       ) : (

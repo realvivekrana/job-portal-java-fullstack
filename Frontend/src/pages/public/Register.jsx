@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import Icon from '../../components/common/Icon'
 import useAuth from '../../hooks/useAuth'
 import useToast from '../../hooks/useToast'
 import { ROLE_HOME, ROLES } from '../../utils/constants'
@@ -9,7 +10,14 @@ export default function Register() {
   const { register, isAuthenticated, user } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', role: ROLES.CANDIDATE })
+  const [searchParams] = useSearchParams()
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirm: '',
+    role: searchParams.get('role') === 'recruiter' ? ROLES.RECRUITER : ROLES.CANDIDATE,
+  })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -57,10 +65,9 @@ export default function Register() {
   const cls = (f) => `input${errors[f] ? ' invalid' : ''}`
 
   return (
-    <div className="auth-wrap">
-      <div className="card auth-card">
-        <h1 className="center">Create your account</h1>
-        <p className="muted center">It only takes a minute</p>
+    <div className="auth-card">
+        <h1>Create your account</h1>
+        <p className="muted">It only takes a minute.</p>
 
         {formError && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{formError}</div>}
 
@@ -70,11 +77,11 @@ export default function Register() {
             <div className="role-picker">
               <button type="button" className={`role-option${form.role === ROLES.CANDIDATE ? ' active' : ''}`}
                 onClick={() => setForm({ ...form, role: ROLES.CANDIDATE })}>
-                <strong>Find a job</strong><span>Candidate</span>
+                <Icon name="search" size={20} /><strong>Find a job</strong><span>Candidate</span>
               </button>
               <button type="button" className={`role-option${form.role === ROLES.RECRUITER ? ' active' : ''}`}
                 onClick={() => setForm({ ...form, role: ROLES.RECRUITER })}>
-                <strong>Hire talent</strong><span>Recruiter</span>
+                <Icon name="building" size={20} /><strong>Hire talent</strong><span>Recruiter</span>
               </button>
             </div>
           </div>
@@ -104,13 +111,12 @@ export default function Register() {
             {errors.confirm && <span className="error-text">{errors.confirm}</span>}
           </div>
 
-          <button className="btn btn-block" disabled={submitting}>{submitting ? 'Creating account...' : 'Create account'}</button>
+          <button className="btn btn-block btn-lg" disabled={submitting}>{submitting ? 'Creating account...' : 'Create account'}</button>
         </form>
 
         <p className="center small mt">
-          Already have an account? <Link to="/login">Sign in</Link>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
-      </div>
     </div>
   )
 }
