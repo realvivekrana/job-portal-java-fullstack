@@ -10,18 +10,25 @@ import com.jobportal.mapper.CompanyMapper;
 import com.jobportal.repository.CompanyRepository;
 import com.jobportal.repository.UserRepository;
 import com.jobportal.service.CompanyService;
+import com.jobportal.service.FileStorageService;
+import com.jobportal.util.TransactionUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, UserRepository userRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository,
+                              UserRepository userRepository,
+                              FileStorageService fileStorageService) {
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -67,6 +74,21 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id " + id));
         return CompanyMapper.toResponse(company);
+    }
+
+    @Override
+    @Transactional
+    public CompanyResponse uploadLogo(Long recruiterId, MultipartFile file) {
+        Company company = findMine(recruiterId);
+        String oldLogo = company.getLogo();
+
+        company.setLogo(fileStorageService.store(file, FileStorageService.Category.LOGO));
+        Company saved = companyRepository.save(company);
+
+        if (oldLogo != null) {
+            TransactionUtil.afterCommit(() -> fileStorageService.delete(FileStorageService.Category.LOGO, oldLogo));
+        }
+        return CompanyMapper.toResponse(saved);
     }
 
     private Company findMine(Long recruiterId) {

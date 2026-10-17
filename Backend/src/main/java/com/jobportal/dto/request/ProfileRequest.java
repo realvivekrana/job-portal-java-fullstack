@@ -3,10 +3,8 @@ package com.jobportal.dto.request;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/** Every field is optional: a candidate can fill the profile bit by bit. PUT replaces all of them. */
 public record ProfileRequest(
-        @Pattern(regexp = "^$|^\\+?[0-9\\s-]{7,20}$",
-                message = "Phone must be 7 to 20 digits and may start with +")
+        @Pattern(regexp = "^$|^[0-9+()\\-\\s]{7,20}$", message = "Phone number is not valid")
         String phone,
 
         @Size(max = 255, message = "Location must be at most 255 characters")

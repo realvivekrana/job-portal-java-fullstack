@@ -1,62 +1,74 @@
 package com.jobportal.util;
 
-import java.util.Arrays;
+import org.springframework.util.StringUtils;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public final class FileUtil {
 
-    /** Stored resumes are always "<uuid>.<pdf|doc|docx>". Anything else is rejected (blocks path traversal). */
-    private static final Pattern STORED_NAME = Pattern.compile(
-            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(pdf|doc|docx)$");
-
-    private static final byte[] PDF_MAGIC = {'%', 'P', 'D', 'F'};
-    private static final byte[] ZIP_MAGIC = {'P', 'K', 3, 4}; // docx is a zip
-    private static final byte[] OLE_MAGIC = {(byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0,
-            (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1}; // legacy .doc
+    private static final Pattern SAFE_NAME = Pattern.compile("^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$");
 
     private FileUtil() {
     }
 
-    /** Lower-case extension without the dot, or "" if there is none. */
-    public static String extension(String filename) {
-        if (filename == null) {
+    /** Stored files are named uuid.ext, so anything else (slashes, "..") is rejected. */
+    public static boolean isSafeFilename(String name) {
+        return name != null && !name.contains("..") && SAFE_NAME.matcher(name).matches();
+    }
+
+    public static String extension(String originalName) {
+        if (originalName == null) {
             return "";
         }
-        int dot = filename.lastIndexOf('.');
-        return dot < 0 ? "" : filename.substring(dot + 1).toLowerCase(Locale.ROOT);
+        String clean = StringUtils.cleanPath(originalName);
+        int dot = clean.lastIndexOf('.');
+        return dot < 0 ? "" : clean.substring(dot + 1).toLowerCase(Locale.ROOT);
     }
 
-    public static boolean isSafeStoredName(String name) {
-        return name != null && STORED_NAME.matcher(name).matches();
+    public static String randomName(String ext) {
+        return UUID.randomUUID() + "." + ext;
     }
 
-    /** The extension and Content-Type are client controlled, so also check the file's first bytes. */
-    public static boolean matchesSignature(String ext, byte[] head) {
+    /** Checks the first bytes of the file so a renamed .exe cannot pass as a .pdf. */
+    public static boolean matchesSignature(String ext, byte[] data) {
         return switch (ext) {
-            case "pdf" -> startsWith(head, PDF_MAGIC);
-            case "docx" -> startsWith(head, ZIP_MAGIC);
-            case "doc" -> startsWith(head, OLE_MAGIC);
+            case "pdf" -> startsWith(data, new byte[]{'%', 'P', 'D', 'F'});
+            case "docx" -> startsWith(data, new byte[]{'P', 'K', 3, 4});
+            case "doc" -> startsWith(data, new byte[]{(byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0});
+            case "png" -> startsWith(data, new byte[]{(byte) 0x89, 'P', 'N', 'G'});
+            case "jpg", "jpeg" -> startsWith(data, new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF});
+            case "webp" -> data != null && data.length >= 12
+                    && startsWith(data, "RIFF".getBytes(StandardCharsets.US_ASCII))
+                    && data[8] == 'W' && data[9] == 'E' && data[10] == 'B' && data[11] == 'P';
             default -> false;
         };
     }
 
-    public static String contentTypeFor(String ext) {
+    public static String contentType(String filename) {
+        String ext = extension(filename);
         return switch (ext) {
             case "pdf" -> "application/pdf";
             case "doc" -> "application/msword";
             case "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "png" -> "image/png";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "webp" -> "image/webp";
             default -> "application/octet-stream";
         };
     }
 
-    /** null in, null out, so DTOs simply show "no resume". */
-    public static String resumeUrl(String storedName) {
-        return storedName == null ? null : Constants.RESUME_URL_PREFIX + storedName;
-    }
-
-    private static boolean startsWith(byte[] head, byte[] magic) {
-        return head != null && head.length >= magic.length
-                && Arrays.equals(Arrays.copyOf(head, magic.length), magic);
+    private static boolean startsWith(byte[] data, byte[] prefix) {
+        if (data == null || data.length < prefix.length) {
+            return false;
+        }
+        for (int i = 0; i < prefix.length; i++) {
+            if (data[i] != prefix[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

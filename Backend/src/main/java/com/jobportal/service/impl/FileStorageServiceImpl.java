@@ -3,7 +3,6 @@ package com.jobportal.service.impl;
 import com.jobportal.exception.BadRequestException;
 import com.jobportal.exception.ResourceNotFoundException;
 import com.jobportal.service.FileStorageService;
-import com.jobportal.util.Constants;
 import com.jobportal.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,85 +13,98 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
+import java.nio.file.StandardOpenOption;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(FileStorageServiceImpl.class);
 
-    private final Path resumeDir;
+    private static final Set<String> RESUME_EXTENSIONS = Set.of("pdf", "doc", "docx");
+    private static final Set<String> LOGO_EXTENSIONS = Set.of("png", "jpg", "jpeg", "webp");
 
-    public FileStorageServiceImpl(@Value("${app.upload.resume-dir:uploads/resumes}") String resumeDir) {
-        this.resumeDir = Paths.get(resumeDir).toAbsolutePath().normalize();
-        try {
-            Files.createDirectories(this.resumeDir);
-        } catch (IOException e) {
-            throw new IllegalStateException("Could not create upload directory " + this.resumeDir, e);
-        }
+    private final Path resumeDir;
+    private final Path logoDir;
+
+    public FileStorageServiceImpl(@Value("${app.upload.resume-dir:uploads/resumes}") String resumeDir,
+                                  @Value("${app.upload.logo-dir:uploads/logos}") String logoDir) {
+        this.resumeDir = prepare(resumeDir);
+        this.logoDir = prepare(logoDir);
     }
 
     @Override
-    public String storeResume(MultipartFile file) {
+    public String store(MultipartFile file, Category category) {
         if (file == null || file.isEmpty()) {
-            throw new BadRequestException("Please choose a resume file to upload");
-        }
-        if (file.getSize() > Constants.MAX_RESUME_SIZE_BYTES) {
-            throw new BadRequestException("Resume must be 5 MB or smaller");
+            throw new BadRequestException("File is required");
         }
 
         String ext = FileUtil.extension(file.getOriginalFilename());
-        if (!Constants.ALLOWED_RESUME_EXTENSIONS.contains(ext)) {
-            throw new BadRequestException("Only PDF, DOC or DOCX resumes are allowed");
+        Set<String> allowed = category == Category.RESUME ? RESUME_EXTENSIONS : LOGO_EXTENSIONS;
+        if (!allowed.contains(ext)) {
+            throw new BadRequestException("Allowed file types: " + String.join(", ", new TreeSet<>(allowed)));
         }
-
-        // The user's file name is never used on disk, so it cannot escape the upload folder.
-        String storedName = UUID.randomUUID() + "." + ext;
-        Path target = resumeDir.resolve(storedName).normalize();
 
         try {
-            byte[] head;
-            try (InputStream in = file.getInputStream()) {
-                head = in.readNBytes(8);
+            byte[] data = file.getBytes();
+            if (!FileUtil.matchesSignature(ext, data)) {
+                throw new BadRequestException("File content does not match its extension");
             }
-            if (!FileUtil.matchesSignature(ext, head)) {
-                throw new BadRequestException("File content does not match its ." + ext + " extension");
-            }
-            try (InputStream in = file.getInputStream()) {
-                Files.copy(in, target);
-            }
+            String filename = FileUtil.randomName(ext);
+            Path target = dirFor(category).resolve(filename).normalize();
+            Files.write(target, data, StandardOpenOption.CREATE_NEW);
+            return filename;
         } catch (IOException e) {
-            log.error("Could not store resume {}", storedName, e);
-            throw new IllegalStateException("Could not store the file", e);
+            throw new UncheckedIOException("Could not store file", e);
         }
-        return storedName;
     }
 
     @Override
-    public Resource loadResume(String storedName) {
-        if (!FileUtil.isSafeStoredName(storedName)) {
+    public Resource load(Category category, String filename) {
+        if (!FileUtil.isSafeFilename(filename)) {
             throw new ResourceNotFoundException("File not found");
         }
-        Path file = resumeDir.resolve(storedName).normalize();
-        if (!file.startsWith(resumeDir) || !Files.isReadable(file)) {
+        Path dir = dirFor(category);
+        Path file = dir.resolve(filename).normalize();
+        if (!file.startsWith(dir) || !Files.isRegularFile(file)) {
             throw new ResourceNotFoundException("File not found");
         }
         return new FileSystemResource(file);
     }
 
     @Override
-    public void deleteResume(String storedName) {
-        if (!FileUtil.isSafeStoredName(storedName)) {
+    public void delete(Category category, String filename) {
+        if (!FileUtil.isSafeFilename(filename)) {
+            return;
+        }
+        Path dir = dirFor(category);
+        Path file = dir.resolve(filename).normalize();
+        if (!file.startsWith(dir)) {
             return;
         }
         try {
-            Files.deleteIfExists(resumeDir.resolve(storedName).normalize());
+            Files.deleteIfExists(file);
         } catch (IOException e) {
-            log.warn("Could not delete resume {}: {}", storedName, e.getMessage());
+            log.warn("Could not delete file {}: {}", file, e.getMessage());
         }
+    }
+
+    private Path dirFor(Category category) {
+        return category == Category.RESUME ? resumeDir : logoDir;
+    }
+
+    private Path prepare(String dir) {
+        Path path = Paths.get(dir).toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not create upload directory " + path, e);
+        }
+        return path;
     }
 }

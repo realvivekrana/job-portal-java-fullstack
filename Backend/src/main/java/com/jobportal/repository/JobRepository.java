@@ -13,4 +13,8 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     Page<Job> findByActiveTrue(Pageable pageable);
 
     long countByPostedById(Long userId);
+
+    long countByPostedByIdAndActive(Long userId, boolean active);
+
+    long countByActive(boolean active);
 }

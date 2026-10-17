@@ -65,6 +65,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/companies/me", "/api/jobs/my").authenticated()
                         // anyone can browse jobs and companies
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**", "/api/companies/**").permitAll()
+                        // company logos are public; resumes (/api/files/resumes/**) need login
+                        .requestMatchers(HttpMethod.GET, "/api/files/logos/**").permitAll()
                         // admin only
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

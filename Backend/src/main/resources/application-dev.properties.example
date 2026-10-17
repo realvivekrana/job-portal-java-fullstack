@@ -10,6 +10,11 @@ spring.jpa.show-sql=true
 app.jwt.secret=YOUR_BASE64_SECRET_KEY
 app.jwt.expiration-ms=86400000
 
+# First admin account (created on startup if it does not exist yet)
+app.admin.name=Admin
+app.admin.email=YOUR_ADMIN_EMAIL
+app.admin.password=YOUR_STRONG_ADMIN_PASSWORD
+
 app.upload.dir=uploads
 app.upload.resume-dir=uploads/resumes
 app.upload.logo-dir=uploads/logos

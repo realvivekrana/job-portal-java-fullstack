@@ -5,11 +5,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageService {
 
-    /** Validates and saves a resume. Returns the stored file name (not a full path). */
-    String storeResume(MultipartFile file);
+    enum Category {
+        RESUME,
+        LOGO
+    }
 
-    Resource loadResume(String storedName);
+    /** Validates and saves the file. Returns the stored file name (uuid.ext). */
+    String store(MultipartFile file, Category category);
 
-    /** Deletes the file if it exists. A missing file is not an error. */
-    void deleteResume(String storedName);
+    Resource load(Category category, String filename);
+
+    void delete(Category category, String filename);
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Application update</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#1f2933;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
+    <tr>
+        <td align="center">
+            <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;">
+                <tr>
+                    <td style="background:#2563eb;padding:20px 28px;color:#ffffff;font-size:20px;font-weight:bold;">
+                        Job Portal
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:28px;">
+                        <h2 style="margin:0 0 16px;font-size:20px;">Your application status changed</h2>
+                        <p style="margin:0 0 16px;line-height:1.5;">
+                            Hi <span th:text="${candidateName}">there</span>,
+                        </p>
+                        <p style="margin:0 0 16px;">
+                            <span th:text="${statusLabel}"
+                                  th:style="'display:inline-block;padding:6px 14px;border-radius:999px;color:#ffffff;font-weight:bold;background:' + ${accentColor}">Status</span>
+                        </p>
+                        <p style="margin:0 0 20px;line-height:1.5;" th:text="${message}">Message</p>
+                        <table cellpadding="0" cellspacing="0" style="background:#f4f6f8;border-radius:6px;width:100%;">
+                            <tr>
+                                <td style="padding:14px 16px;">
+                                    <div style="font-size:12px;color:#6b7280;">Job</div>
+                                    <div style="font-size:16px;font-weight:bold;" th:text="${jobTitle}">Job title</div>
+                                    <div style="font-size:14px;color:#4b5563;margin-top:4px;" th:text="${companyName}">Company</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 28px;background:#f9fafb;font-size:12px;color:#9ca3af;">
+                        This is an automated email from Job Portal. Please do not reply.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

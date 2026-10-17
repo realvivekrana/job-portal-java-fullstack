@@ -1,6 +1,5 @@
 package com.jobportal.dto.response;
 
-/** id is null until the candidate saves the profile for the first time. */
 public record ProfileResponse(
         Long id,
         Long userId,

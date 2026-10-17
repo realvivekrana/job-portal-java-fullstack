@@ -3,7 +3,7 @@ package com.jobportal.mapper;
 import com.jobportal.dto.response.ProfileResponse;
 import com.jobportal.entity.CandidateProfile;
 import com.jobportal.entity.User;
-import com.jobportal.util.FileUtil;
+import com.jobportal.util.Constants;
 
 public final class ProfileMapper {
 
@@ -23,12 +23,6 @@ public final class ProfileMapper {
                 p.getSkills(),
                 p.getExperience(),
                 p.getEducation(),
-                FileUtil.resumeUrl(p.getResumePath()));
-    }
-
-    /** For a candidate who has not saved a profile yet. */
-    public static ProfileResponse empty(User u) {
-        return new ProfileResponse(null, u.getId(), u.getName(), u.getEmail(),
-                null, null, null, null, null, null);
+                p.getResumePath() == null ? null : Constants.RESUME_URL_PREFIX + p.getResumePath());
     }
 }
