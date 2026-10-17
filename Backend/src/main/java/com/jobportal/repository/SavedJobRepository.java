@@ -4,6 +4,7 @@ import com.jobportal.entity.SavedJob;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,7 +21,12 @@ public interface SavedJobRepository extends JpaRepository<SavedJob, Long> {
     List<Long> findJobIdsByCandidateId(@Param("candidateId") Long candidateId);
 
     @Query(value = "select s from SavedJob s join fetch s.job j join fetch j.company join fetch j.postedBy "
-            + "where s.candidate.id = :candidateId",
-            countQuery = "select count(s) from SavedJob s where s.candidate.id = :candidateId")
+            + "where s.candidate.id = :candidateId and j.active = true",
+            countQuery = "select count(s) from SavedJob s where s.candidate.id = :candidateId and s.job.active = true")
     Page<SavedJob> findDetailedByCandidateId(@Param("candidateId") Long candidateId, Pageable pageable);
+
+    /** Used when an admin deletes a job, so the foreign key does not block it. */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from SavedJob s where s.job.id = :jobId")
+    void deleteByJobId(@Param("jobId") Long jobId);
 }

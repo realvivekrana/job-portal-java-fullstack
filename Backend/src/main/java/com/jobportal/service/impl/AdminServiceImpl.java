@@ -9,6 +9,7 @@ import com.jobportal.exception.ResourceNotFoundException;
 import com.jobportal.mapper.JobMapper;
 import com.jobportal.repository.ApplicationRepository;
 import com.jobportal.repository.JobRepository;
+import com.jobportal.repository.SavedJobRepository;
 import com.jobportal.repository.UserRepository;
 import com.jobportal.service.AdminService;
 import com.jobportal.service.ResumeFileCleaner;
@@ -36,15 +37,18 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final ApplicationRepository applicationRepository;
+    private final SavedJobRepository savedJobRepository;
     private final ResumeFileCleaner resumeFileCleaner;
 
     public AdminServiceImpl(UserRepository userRepository,
                             JobRepository jobRepository,
                             ApplicationRepository applicationRepository,
+                            SavedJobRepository savedJobRepository,
                             ResumeFileCleaner resumeFileCleaner) {
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.applicationRepository = applicationRepository;
+        this.savedJobRepository = savedJobRepository;
         this.resumeFileCleaner = resumeFileCleaner;
     }
 
@@ -109,6 +113,7 @@ public class AdminServiceImpl implements AdminService {
                 .distinct()
                 .toList();
         applicationRepository.deleteByJobId(jobId);
+        savedJobRepository.deleteByJobId(jobId);
         jobRepository.delete(job);
 
         TransactionUtil.afterCommit(() -> resumePaths.forEach(resumeFileCleaner::deleteIfUnreferenced));

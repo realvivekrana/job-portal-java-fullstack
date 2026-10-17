@@ -38,7 +38,7 @@ public class SiteServiceImpl implements SiteService {
     static {
         DEFAULTS.put("siteName", "JobPortal");
         DEFAULTS.put("siteTagline", "Find jobs. Hire talent.");
-        DEFAULTS.put("heroTitle", "Find work you want to wake up for.");
+        DEFAULTS.put("heroTitle", "Find your next job");
         DEFAULTS.put("heroLead", "Search openings from companies that are hiring now, apply in a couple of taps and follow every application in one place.");
         DEFAULTS.put("candidatePoints", "Filter by skill, location, job type and salary\nApply with a saved resume and a short cover letter\nTrack every application from applied to hired");
         DEFAULTS.put("recruiterPoints", "Create your company page and post jobs in minutes\nReview applicants and open resumes in one click\nShortlist, hire or reject with automatic email updates");
