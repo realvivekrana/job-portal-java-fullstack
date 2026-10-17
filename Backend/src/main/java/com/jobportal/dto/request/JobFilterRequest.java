@@ -8,6 +8,13 @@ public record JobFilterRequest(
         String location,
         JobType jobType,
         Double minSalary,
-        Integer maxExperience
+        Integer maxExperience,
+        Integer postedWithinDays
 ) {
+
+    /** Keeps the original 5-argument form working. */
+    public JobFilterRequest(String keyword, String location, JobType jobType,
+                            Double minSalary, Integer maxExperience) {
+        this(keyword, location, jobType, minSalary, maxExperience, null);
+    }
 }

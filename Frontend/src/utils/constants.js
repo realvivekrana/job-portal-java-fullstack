@@ -20,6 +20,7 @@ export const JOB_TYPES = [
 export const APPLICATION_STATUSES = [
   { value: 'APPLIED', label: 'Applied' },
   { value: 'SHORTLISTED', label: 'Shortlisted' },
+  { value: 'INTERVIEWING', label: 'Interviewing' },
   { value: 'HIRED', label: 'Hired' },
   { value: 'REJECTED', label: 'Rejected' },
 ]
@@ -27,7 +28,8 @@ export const APPLICATION_STATUSES = [
 // Same rules as the backend (ApplicationServiceImpl.ALLOWED_TRANSITIONS)
 export const STATUS_TRANSITIONS = {
   APPLIED: ['SHORTLISTED', 'REJECTED'],
-  SHORTLISTED: ['HIRED', 'REJECTED'],
+  SHORTLISTED: ['INTERVIEWING', 'HIRED', 'REJECTED'],
+  INTERVIEWING: ['HIRED', 'REJECTED'],
   HIRED: [],
   REJECTED: [],
 }
@@ -39,6 +41,29 @@ export const SORT_OPTIONS = [
   { value: 'salaryMin:asc', label: 'Lowest salary' },
   { value: 'experienceRequired:asc', label: 'Least experience' },
   { value: 'title:asc', label: 'Title A-Z' },
+]
+
+export const DATE_POSTED = [
+  { value: '', label: 'Any time' },
+  { value: '1', label: 'Last 24 hours' },
+  { value: '3', label: 'Last 3 days' },
+  { value: '7', label: 'Last 7 days' },
+  { value: '14', label: 'Last 14 days' },
+]
+
+export const SALARY_STEPS = [
+  { value: '', label: 'Any pay' },
+  { value: '200000', label: '₹2,00,000+' },
+  { value: '400000', label: '₹4,00,000+' },
+  { value: '800000', label: '₹8,00,000+' },
+  { value: '1500000', label: '₹15,00,000+' },
+]
+
+export const EXPERIENCE_LEVELS = [
+  { value: '', label: 'Any experience' },
+  { value: '0', label: 'Fresher' },
+  { value: '2', label: 'Up to 2 years' },
+  { value: '5', label: 'Up to 5 years' },
 ]
 
 export const ROLE_HOME = {
@@ -55,7 +80,7 @@ export const LOGO_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp']
 export const DEFAULT_SITE = {
   siteName: 'JobPortal',
   siteTagline: 'Find jobs. Hire talent.',
-  heroTitle: 'Find work you want to wake up for.',
+  heroTitle: 'Find your next job',
   heroLead:
     'Search openings from companies that are hiring now, apply in a couple of taps and follow every application in one place.',
   candidatePoints:

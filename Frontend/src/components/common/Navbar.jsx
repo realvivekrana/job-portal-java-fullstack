@@ -56,8 +56,11 @@ export default function Navbar() {
           <div className="nav-links">
             <NavLink to="/" end className={linkClass} onClick={close}>Home</NavLink>
             <NavLink to="/jobs" className={linkClass} onClick={close}>Find jobs</NavLink>
-            {!isAuthenticated && (
-              <NavLink to="/register?role=recruiter" className="nav-link" onClick={close}>For recruiters</NavLink>
+            {user?.role === 'CANDIDATE' && (
+              <>
+                <NavLink to="/candidate/saved" className={linkClass} onClick={close}>Saved</NavLink>
+                <NavLink to="/candidate/applications" className={linkClass} onClick={close}>Applied</NavLink>
+              </>
             )}
           </div>
 
@@ -81,8 +84,8 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="btn btn-outline btn-sm" onClick={close}>Log in</Link>
-                <Link to="/register" className="btn btn-sm" onClick={close}>Sign up free</Link>
+                <Link to="/login" className="ij-signin" onClick={close}>Sign in</Link>
+                <Link to="/register?role=recruiter" className="ij-employers" onClick={close}>Employers / Post a job</Link>
               </>
             )}
           </div>

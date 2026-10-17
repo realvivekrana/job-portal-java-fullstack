@@ -13,8 +13,19 @@ A full stack job portal where recruiters post jobs and candidates search and app
 - Candidate: profile, resume upload, apply with cover letter, track status, withdraw
 - Job search with keyword, location, type, salary and experience filters, sorting and pagination
 - Admin: platform stats, user list with enable / disable, job moderation (close, reopen, delete)
+- Indeed style experience: What / Where search, pill filters (date posted, job type, pay, experience), two-pane results with job details on the right (desktop) and full job page (mobile), search state kept in the URL
+- Candidate: Save (bookmark) jobs, Saved jobs page, Applied jobs, public company pages
+- Hiring pipeline: Applied -> Shortlisted -> Interviewing -> Hired / Rejected
 - Email notifications (application received, new applicant, status changes)
 - Private resume downloads (only the candidate, the job's recruiter or an admin)
+
+## Upgrading an existing database
+This version adds a `saved_jobs` table (created automatically) and a new application status `INTERVIEWING`.
+MySQL may have created `applications.status` as a native ENUM, so run this once on an existing database:
+
+```sql
+ALTER TABLE applications MODIFY status VARCHAR(20) NOT NULL;
+```
 
 ## Run Locally
 
@@ -54,7 +65,8 @@ Send `Authorization: Bearer <token>` for protected endpoints.
 | Area | Endpoints |
 |------|-----------|
 | Auth | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/users/me` |
-| Jobs (public) | `GET /api/jobs` (filters: keyword, location, jobType, minSalary, maxExperience, page, size, sortBy, sortDir), `GET /api/jobs/{id}` |
+| Saved jobs (candidate) | `GET /api/saved-jobs`, `GET /api/saved-jobs/ids`, `POST/DELETE /api/saved-jobs/{jobId}` |
+| Jobs (public) | `GET /api/jobs` (filters: keyword, location, jobType, minSalary, maxExperience, postedWithinDays, page, size, sortBy, sortDir), `GET /api/jobs/{id}` |
 | Jobs (recruiter) | `POST /api/jobs`, `PUT /api/jobs/{id}`, `PATCH /api/jobs/{id}/status?active=`, `GET /api/jobs/my` |
 | Company | `POST /api/companies`, `GET/PUT /api/companies/me`, `POST /api/companies/me/logo`, `GET /api/companies/{id}` |
 | Candidate profile | `GET/PUT /api/profile/me`, `POST/DELETE /api/profile/me/resume` |

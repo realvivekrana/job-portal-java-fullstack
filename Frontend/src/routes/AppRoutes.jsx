@@ -9,6 +9,7 @@ import DashboardLayout from '../components/layout/DashboardLayout'
 import Home from '../pages/public/Home'
 import JobListing from '../pages/public/JobListing'
 import JobDetailsPage from '../pages/public/JobDetailsPage'
+import CompanyPage from '../pages/public/CompanyPage'
 import Login from '../pages/public/Login'
 import Register from '../pages/public/Register'
 import NotFound from '../pages/public/NotFound'
@@ -16,6 +17,7 @@ import NotFound from '../pages/public/NotFound'
 import CandidateDashboard from '../pages/candidate/CandidateDashboard'
 import CandidateProfile from '../pages/candidate/CandidateProfile'
 import MyApplications from '../pages/candidate/MyApplications'
+import SavedJobs from '../pages/candidate/SavedJobs'
 
 import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard'
 import CompanyProfile from '../pages/recruiter/CompanyProfile'
@@ -35,6 +37,7 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<JobListing />} />
         <Route path="/jobs/:id" element={<JobDetailsPage />} />
+        <Route path="/companies/:id" element={<CompanyPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -49,6 +52,7 @@ export default function AppRoutes() {
             <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
             <Route path="/candidate/profile" element={<CandidateProfile />} />
             <Route path="/candidate/applications" element={<MyApplications />} />
+            <Route path="/candidate/saved" element={<SavedJobs />} />
           </Route>
 
           <Route element={<RoleRoute roles={[ROLES.RECRUITER]} />}>

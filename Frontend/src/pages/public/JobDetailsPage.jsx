@@ -7,6 +7,7 @@ import ErrorState from '../../components/common/ErrorState'
 import EmptyState from '../../components/common/EmptyState'
 import JobDetails, { JobSummary } from '../../components/job/JobDetails'
 import ApplyModal from '../../components/application/ApplyModal'
+import SaveButton from '../../components/job/SaveButton'
 import useApi from '../../hooks/useApi'
 import useAuth from '../../hooks/useAuth'
 import { getJob } from '../../api/jobApi'
@@ -86,18 +87,19 @@ export default function JobDetailsPage() {
           <div>
             <h1>{job.title}</h1>
             <div className="job-meta">
-              <span><Icon name="building" size={15} /> {job.companyName}</span>
+              <span><Icon name="building" size={15} /> <Link to={`/companies/${job.companyId}`}>{job.companyName}</Link></span>
               <span><Icon name="pin" size={15} /> {job.location}</span>
               <span><Icon name="briefcase" size={15} /> {jobTypeLabel(job.jobType)}</span>
               <span><Icon name="clock" size={15} /> {timeAgo(job.createdAt)}</span>
             </div>
           </div>
         </div>
-        <div>
-          <div className="muted small">Salary</div>
-          <strong style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>
-            {formatSalary(job.salaryMin, job.salaryMax)}
-          </strong>
+        <div className="row row-between">
+          <div>
+            <div className="muted small">Pay</div>
+            <strong style={{ fontSize: '1.2rem' }}>{formatSalary(job.salaryMin, job.salaryMax)}</strong>
+          </div>
+          <SaveButton jobId={job.id} withLabel />
         </div>
       </div>
 

@@ -103,6 +103,7 @@ public class EmailServiceImpl implements EmailService {
     private String messageFor(ApplicationStatus status) {
         return switch (status) {
             case SHORTLISTED -> "Good news! You have been shortlisted. The recruiter may contact you soon.";
+            case INTERVIEWING -> "Great news! The employer would like to interview you. Watch your inbox and phone for next steps.";
             case HIRED -> "Congratulations! You have been selected for this role.";
             case REJECTED -> "Thank you for applying. The recruiter has decided not to move forward with "
                     + "your application this time. We wish you all the best.";
@@ -113,6 +114,7 @@ public class EmailServiceImpl implements EmailService {
     private String colorFor(ApplicationStatus status) {
         return switch (status) {
             case SHORTLISTED -> "#2563eb";
+            case INTERVIEWING -> "#7c3aed";
             case HIRED -> "#16a34a";
             case REJECTED -> "#dc2626";
             case APPLIED -> "#6b7280";

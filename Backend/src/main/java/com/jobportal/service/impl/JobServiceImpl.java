@@ -25,6 +25,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -190,6 +191,10 @@ public class JobServiceImpl implements JobService {
                 }
                 if (f.minSalary() != null) {
                     p.add(cb.greaterThanOrEqualTo(root.<Double>get("salaryMax"), f.minSalary()));
+                }
+                if (f.postedWithinDays() != null && f.postedWithinDays() > 0) {
+                    p.add(cb.greaterThanOrEqualTo(root.<LocalDateTime>get("createdAt"),
+                            LocalDateTime.now().minusDays(f.postedWithinDays())));
                 }
                 if (f.maxExperience() != null) {
                     p.add(cb.or(

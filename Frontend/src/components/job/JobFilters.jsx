@@ -1,77 +1,81 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Icon from '../common/Icon'
-import useSite from '../../hooks/useSite'
-import { JOB_TYPES, SORT_OPTIONS } from '../../utils/constants'
+import { DATE_POSTED, EXPERIENCE_LEVELS, JOB_TYPES, SALARY_STEPS } from '../../utils/constants'
 
-export default function JobFilters({ filters, onChange, onReset }) {
+const TYPE_OPTIONS = [{ value: '', label: 'Any type' }, ...JOB_TYPES]
+
+/** One Indeed style pill: shows the current choice and opens a small menu of options. */
+function Pill({ label, value, options, onPick }) {
   const [open, setOpen] = useState(false)
-  const { overview, refreshOverview } = useSite()
+  const ref = useRef(null)
+  const current = options.find((o) => o.value === value)
+
   useEffect(() => {
-    if (!overview) refreshOverview()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  const activeCount = ['keyword', 'location', 'jobType', 'minSalary', 'maxExperience'].filter((k) => filters[k]).length
+    if (!open) return undefined
+    const away = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false)
+    const esc = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', away)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('mousedown', away)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [open])
 
   return (
-    <aside className="card filters">
-      <div className="row row-between">
-        <h3 style={{ margin: 0 }}>
-          <Icon name="filter" size={17} /> Filters {activeCount > 0 && <span className="badge badge-new">{activeCount}</span>}
-        </h3>
-        <button type="button" className="btn btn-outline btn-sm filters-toggle" aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}>
-          {open ? 'Hide' : 'Show'}
-        </button>
-      </div>
+    <div className="ij-pill-wrap" ref={ref}>
+      <button
+        type="button"
+        className={`ij-pill${value ? ' on' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {value ? current?.label : label}
+        <Icon name="chevD" size={14} />
+      </button>
+      {open && (
+        <ul className="ij-menu" role="listbox" aria-label={label}>
+          {options.map((o) => (
+            <li key={o.value || 'any'}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={o.value === value}
+                className={o.value === value ? 'sel' : ''}
+                onClick={() => {
+                  onPick(o.value)
+                  setOpen(false)
+                }}
+              >
+                {o.label}
+                {o.value === value && <Icon name="check" size={14} />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
-      <div className={`filters-body${open ? ' open' : ''}`}>
-        <div className="field">
-          <label htmlFor="f-keyword">Keyword</label>
-          <input id="f-keyword" className="input" list="f-keyword-list" placeholder="Title, skill or company"
-            value={filters.keyword} onChange={(e) => onChange({ keyword: e.target.value })} />
-        </div>
-        <div className="field">
-          <label htmlFor="f-location">Location</label>
-          <input id="f-location" className="input" list="f-location-list" placeholder="City or state"
-            value={filters.location} onChange={(e) => onChange({ location: e.target.value })} />
-        </div>
-        <datalist id="f-keyword-list">
-          {(overview?.popularSkills || []).map((k) => <option key={k} value={k} />)}
-        </datalist>
-        <datalist id="f-location-list">
-          {(overview?.popularLocations || []).map((l) => <option key={l} value={l} />)}
-        </datalist>
-        <div className="field">
-          <label htmlFor="f-type">Job type</label>
-          <select id="f-type" className="input" value={filters.jobType}
-            onChange={(e) => onChange({ jobType: e.target.value })}>
-            <option value="">All types</option>
-            {JOB_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="f-salary">Minimum salary (₹)</label>
-          <input id="f-salary" type="number" min="0" step="10000" className="input" placeholder="e.g. 300000"
-            value={filters.minSalary} onChange={(e) => onChange({ minSalary: e.target.value })} />
-        </div>
-        <div className="field">
-          <label htmlFor="f-exp">Max experience required (years)</label>
-          <input id="f-exp" type="number" min="0" max="50" className="input" placeholder="e.g. 2"
-            value={filters.maxExperience} onChange={(e) => onChange({ maxExperience: e.target.value })} />
-        </div>
-        <div className="field">
-          <label htmlFor="f-sort">Sort by</label>
-          <select id="f-sort" className="input" value={filters.sort}
-            onChange={(e) => onChange({ sort: e.target.value })}>
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
-        <button type="button" className="btn btn-outline" onClick={onReset}>Clear all filters</button>
-      </div>
-    </aside>
+export default function JobFilters({ filters, onChange, onReset }) {
+  const active = ['jobType', 'minSalary', 'maxExperience', 'postedWithinDays'].some((k) => filters[k])
+  return (
+    <div className="ij-filters" role="group" aria-label="Filter jobs">
+      <Pill label="Date posted" value={filters.postedWithinDays} options={DATE_POSTED}
+        onPick={(v) => onChange({ postedWithinDays: v })} />
+      <Pill label="Job type" value={filters.jobType} options={TYPE_OPTIONS}
+        onPick={(v) => onChange({ jobType: v })} />
+      <Pill label="Pay" value={filters.minSalary} options={SALARY_STEPS}
+        onPick={(v) => onChange({ minSalary: v })} />
+      <Pill label="Experience" value={filters.maxExperience} options={EXPERIENCE_LEVELS}
+        onPick={(v) => onChange({ maxExperience: v })} />
+      {active && (
+        <button type="button" className="ij-reset" onClick={onReset}>
+          <Icon name="x" size={14} /> Clear filters
+        </button>
+      )}
+    </div>
   )
 }

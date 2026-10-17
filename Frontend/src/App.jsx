@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SiteProvider } from './context/SiteContext'
 import { ToastProvider } from './context/ToastContext'
+import { SavedJobsProvider } from './context/SavedJobsContext'
 import AppRoutes from './routes/AppRoutes'
 
 function ScrollToTop() {
@@ -18,10 +19,12 @@ export default function App() {
     <SiteProvider>
       <AuthProvider>
         <ToastProvider>
-          <ScrollToTop />
-          <div className="app">
-            <AppRoutes />
-          </div>
+          <SavedJobsProvider>
+            <ScrollToTop />
+            <div className="app">
+              <AppRoutes />
+            </div>
+          </SavedJobsProvider>
         </ToastProvider>
       </AuthProvider>
     </SiteProvider>

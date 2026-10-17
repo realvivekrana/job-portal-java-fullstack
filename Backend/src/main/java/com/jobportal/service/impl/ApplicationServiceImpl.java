@@ -50,7 +50,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     /** Recruiter can move an application forward only. HIRED and REJECTED are final. */
     private static final Map<ApplicationStatus, Set<ApplicationStatus>> ALLOWED_TRANSITIONS = Map.of(
             ApplicationStatus.APPLIED, Set.of(ApplicationStatus.SHORTLISTED, ApplicationStatus.REJECTED),
-            ApplicationStatus.SHORTLISTED, Set.of(ApplicationStatus.HIRED, ApplicationStatus.REJECTED));
+            ApplicationStatus.SHORTLISTED, Set.of(ApplicationStatus.INTERVIEWING, ApplicationStatus.HIRED, ApplicationStatus.REJECTED),
+            ApplicationStatus.INTERVIEWING, Set.of(ApplicationStatus.HIRED, ApplicationStatus.REJECTED));
 
     private final ApplicationRepository applicationRepository;
     private final JobRepository jobRepository;

@@ -52,12 +52,13 @@ public class JobController {
             @RequestParam(required = false) JobType jobType,
             @RequestParam(required = false) Double minSalary,
             @RequestParam(required = false) Integer maxExperience,
+            @RequestParam(required = false) Integer postedWithinDays,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
 
-        JobFilterRequest filter = new JobFilterRequest(keyword, location, jobType, minSalary, maxExperience);
+        JobFilterRequest filter = new JobFilterRequest(keyword, location, jobType, minSalary, maxExperience, postedWithinDays);
         return ResponseEntity.ok(ApiResponse.ok("Jobs",
                 jobService.search(filter, page, size, sortBy, sortDir)));
     }

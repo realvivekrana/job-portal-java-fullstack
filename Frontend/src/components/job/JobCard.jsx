@@ -1,49 +1,62 @@
 import { Link } from 'react-router-dom'
 import Icon from '../common/Icon'
-import { formatSalary, initials, jobTypeLabel, skillsToArray, timeAgo } from '../../utils/helpers'
+import SaveButton from './SaveButton'
+import { formatSalary, jobTypeLabel, skillsToArray, timeAgo } from '../../utils/helpers'
 
 const isNew = (value) => value && Date.now() - new Date(value).getTime() < 3 * 24 * 3600 * 1000
+const isDesktop = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
 
-export default function JobCard({ job }) {
-  const skills = skillsToArray(job.skills).slice(0, 4)
-  const hasExp = job.experienceRequired !== null && job.experienceRequired !== undefined
+/**
+ * Search result card. On wide screens clicking it calls `onSelect` so the job opens in the
+ * side pane (like Indeed); on phones it goes to the full job page.
+ */
+export default function JobCard({ job, selected = false, onSelect, applied = false }) {
+  const skills = skillsToArray(job.skills).slice(0, 3)
+  const hasSalary = job.salaryMin != null || job.salaryMax != null
+
+  const open = (e) => {
+    if (onSelect && isDesktop()) {
+      e.preventDefault()
+      onSelect(job)
+    }
+  }
+
   return (
-    <article className="card job-card">
-      <div className="job-card-head">
-        <span className="avatar avatar-lg">{initials(job.companyName)}</span>
-        <div>
+    <article className={`ij-card${selected ? ' selected' : ''}`}>
+      <div className="ij-card-top">
+        <div className="ij-card-main">
+          {isNew(job.createdAt) && <span className="ij-new">New</span>}
           <h3>
-            <Link to={`/jobs/${job.id}`}>{job.title}</Link>
+            <Link to={`/jobs/${job.id}`} onClick={open}>{job.title}</Link>
           </h3>
-          <span className="muted small">{job.companyName}</span>
+          <Link to={`/companies/${job.companyId}`} className="ij-company">{job.companyName}</Link>
+          <div className="ij-loc">{job.location}</div>
         </div>
+        <SaveButton jobId={job.id} />
       </div>
 
-      <div className="job-meta">
-        <span><Icon name="pin" size={15} /> {job.location}</span>
-        <span><Icon name="briefcase" size={15} /> {jobTypeLabel(job.jobType)}</span>
-        <span><Icon name="rupee" size={15} /> {formatSalary(job.salaryMin, job.salaryMax)}</span>
-        {hasExp && (
-          <span><Icon name="cap" size={15} /> {job.experienceRequired === 0 ? 'Fresher' : `${job.experienceRequired}+ yrs`}</span>
-        )}
+      <div className="ij-chips">
+        {hasSalary && <span className="ij-chip pay">{formatSalary(job.salaryMin, job.salaryMax)}</span>}
+        <span className="ij-chip">{jobTypeLabel(job.jobType)}</span>
+        {job.experienceRequired === 0 && <span className="ij-chip">Fresher</span>}
+        {job.experienceRequired > 0 && <span className="ij-chip">{job.experienceRequired}+ yrs</span>}
       </div>
 
-      <p className="job-desc">{job.description}</p>
+      <p className="ij-snippet">{job.description}</p>
 
       {skills.length > 0 && (
-        <div className="tags">
-          {skills.map((s) => (
-            <span key={s} className="tag">{s}</span>
-          ))}
-        </div>
+        <ul className="ij-skills">
+          {skills.map((s) => <li key={s}>{s}</li>)}
+        </ul>
       )}
 
-      <div className="job-card-foot">
-        <span className="muted small row" style={{ gap: '.5rem' }}>
-          {isNew(job.createdAt) && <span className="badge badge-new">New</span>}
-          {timeAgo(job.createdAt)}
-        </span>
-        <Link to={`/jobs/${job.id}`} className="btn btn-outline btn-sm">View details</Link>
+      <div className="ij-card-foot">
+        {applied ? (
+          <span className="ij-applied"><Icon name="check" size={14} /> Applied</span>
+        ) : (
+          <span className="ij-easy"><Icon name="zap" size={14} /> Easily apply</span>
+        )}
+        <span>{timeAgo(job.createdAt)}</span>
       </div>
     </article>
   )

@@ -92,10 +92,10 @@ export default function ApplicationCard({ application, variant = 'candidate', on
             <button
               key={s}
               disabled={busy}
-              className={`btn btn-sm ${s === 'REJECTED' ? 'btn-danger' : 'btn-success'}`}
+              className={`btn btn-sm ${s === 'REJECTED' ? 'btn-danger' : s === 'INTERVIEWING' ? '' : 'btn-success'}`}
               onClick={() => onStatusChange(a, s)}
             >
-              {s === 'SHORTLISTED' ? 'Shortlist' : s === 'HIRED' ? 'Hire' : 'Reject'}
+              {s === 'SHORTLISTED' ? 'Shortlist' : s === 'INTERVIEWING' ? 'Interview' : s === 'HIRED' ? 'Hire' : 'Reject'}
             </button>
           ))}
       </div>

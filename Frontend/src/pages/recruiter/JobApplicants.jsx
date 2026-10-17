@@ -42,9 +42,9 @@ export default function JobApplicants() {
     }
   }
 
-  // Rejecting and hiring are final, so ask first. Shortlisting goes straight through.
+  // Rejecting and hiring are final, so ask first. Shortlisting and interviews go straight through.
   const onStatusChange = (application, next) => {
-    if (next === 'SHORTLISTED') apply(application, next)
+    if (next === 'SHORTLISTED' || next === 'INTERVIEWING') apply(application, next)
     else setPending({ application, status: next })
   }
 
